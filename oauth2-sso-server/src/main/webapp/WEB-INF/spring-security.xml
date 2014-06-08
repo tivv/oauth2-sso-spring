@@ -1,0 +1,37 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:oauth2="http://www.springframework.org/schema/security/oauth2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+    http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+	">
+
+    <http pattern="/oauth/token" authentication-manager-ref="clientAuthenticationManager">
+        <http-basic/>
+    </http>
+	<http auto-config="true">
+		<intercept-url pattern="/**" access="ROLE_USER" />
+	</http>
+
+	<authentication-manager>
+	  <authentication-provider>
+	    <user-service>
+		    <user name="test" password="test" authorities="ROLE_USER" />
+	    </user-service>
+	  </authentication-provider>
+	</authentication-manager>
+
+    <authentication-manager id="clientAuthenticationManager">
+        <authentication-provider user-service-ref="clientUserService"/>
+    </authentication-manager>
+
+    <beans:bean id="clientUserService" class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <beans:constructor-arg ref="clientDetailsService" />
+    </beans:bean>
+
+    <oauth2:client-details-service id="clientDetailsService">
+        <oauth2:client client-id="testClient" secret="test" />
+    </oauth2:client-details-service>
+</beans:beans>
